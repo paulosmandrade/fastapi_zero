@@ -10,6 +10,7 @@ python = "^3.11"
 fastapi = "^0.110.0"
 uvicorn = "^0.28.0"
 httpx = "^0.27.0"
+pydantic = {extras = ["email"], version = "^2.6.3"}
 
 
 [tool.poetry.group.pytest.dependencies]
