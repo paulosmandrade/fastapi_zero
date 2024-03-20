@@ -6,11 +6,15 @@ class UserSchema(BaseModel):
     email: EmailStr
     password: str
 
+
 class UserPublic(BaseModel):
     username: str
-    email : EmailStr
+    email: EmailStr
+
 
 class UserDB(UserSchema):
     id: int
 
-    
+
+class UserList(BaseModel):
+    users: list[UserPublic]
