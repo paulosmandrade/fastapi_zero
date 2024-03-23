@@ -58,3 +58,37 @@ def test_delete_user(client):
 
     assert response.status_code == 200
     assert response.json() == {'message': 'User deleted'}
+
+
+def test_erro_update_user_404_not_found(client):
+    response = client.put(
+        '/users/1000',
+        json={
+            'username': 'Fernanda',
+            'email': 'fernanda@exemplo.com.br',
+            'password': '123456',
+        },
+    )
+    assert response.status_code == 404
+
+
+def test_erro_delete_user_404_not_found(client):
+    response = client.delete('/users/1000')
+
+    assert response.status_code == 404
+
+
+def test_retorna_usuario_especifico(client):
+    response = client.post(
+        '/users/',
+        json={
+            'username': 'paulo',
+            'email': 'paulo@example.com',
+            'password': 'secret',
+        },
+    )
+    assert response.status_code == 201
+
+    response = client.get('/users/1')
+
+    assert response.status_code == 200
