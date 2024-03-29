@@ -52,49 +52,54 @@ def test_read_users_with_users(user):
     } == {'users': [user_schema]}
 
 
-def test_update_user(client, user):
+def test_update_user(client, user, token):
     response = client.put(
-        '/users/1',
+        f'/users/{user.id}',
+        headers={'Authorization': f'Bearer {token}'},
         json={
-            'username': 'Bernardo',
-            'email': 'bernardo@example.com.br',
-            'password': 'ratunamatata',
+            'username': 'bob',
+            'email': 'bob@example.com',
+            'password': 'mynewpassword',
         },
     )
     assert response.status_code == 200
     assert response.json() == {
-        'username': 'Bernardo',
-        'email': 'bernardo@example.com.br',
+        'username': 'bob',
+        'email': 'bob@example.com',
         'id': 1,
     }
 
 
-def test_delete_user(client, user):
-    response = client.delete('/users/1')
+def test_delete_user(client, user, token):
+    response = client.delete(
+        f'/users/{user.id}',
+        headers={'Authorization': f'Bearer {token}'},
+    )
 
     assert response.status_code == 200
     assert response.json() == {'message': 'User deleted'}
 
 
-def test_erro_update_user_404_not_found(client):
+def test_erro_update_user_400_not_permission(client, token):
     response = client.put(
-        '/users/1000',
+        '/users/100000000',
+        headers={'Authorization': f'Bearer {token}'},
         json={
             'username': 'Fernanda',
             'email': 'fernanda@exemplo.com.br',
             'password': '123456',
         },
     )
-    assert response.status_code == 404
+    assert response.status_code == 400
 
 
-def test_erro_delete_user_404_not_found(client, user):
+def test_erro_delete_user_401_not_permission(client):
     response = client.delete('/users/1000')
 
-    assert response.status_code == 404
+    assert response.status_code == 401
 
 
-def test_retorna_usuario_especifico(client, user):
+def test_retorna_usuario_especifico(client):
     response = client.post(
         '/users/',
         json={
@@ -108,3 +113,15 @@ def test_retorna_usuario_especifico(client, user):
     response = client.get('/users/1')
 
     assert response.status_code == 200
+
+
+def test_get_token(client, user):
+    response = client.post(
+        '/token',
+        data={'username': user.email, 'password': user.clean_password},
+    )
+    token = response.json()
+
+    assert response.status_code == 200
+    assert 'access_token' in token
+    assert 'token_type' in token
